@@ -1,0 +1,33 @@
+{
+    "name": "cloudmyn/spellchecker",
+    "description": "PHP spell checker using soundex algorithm",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "CloudMyn\\SpellChecker\\": "src/"
+        },
+        "files": [
+            "src/Helpers/helpers.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Cloudmyn",
+            "email": "cloudmyn46@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "cloudmyn/soundex": "^v0.0.2"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "CloudMyn\\SpellChecker\\SpellCheckerServiceProvider"
+            ]
+        },
+        "aliases": {
+            "Logger": "CloudMyn\\SpellChecker\\Helpers"
+        }
+    }
+}

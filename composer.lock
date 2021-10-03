@@ -1,0 +1,56 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "52afdcd258ff6e90b666903b77933241",
+    "packages": [
+        {
+            "name": "cloudmyn/soundex",
+            "version": "v0.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/CloudMyn/Soundex.git",
+                "reference": "9e35c94717fee127d7e26cd2e05e1b614fa753ec"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/CloudMyn/Soundex/zipball/9e35c94717fee127d7e26cd2e05e1b614fa753ec",
+                "reference": "9e35c94717fee127d7e26cd2e05e1b614fa753ec",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Cloudmyn\\Soundex\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Cloudmyn",
+                    "email": "cloudmyn46@gmail.com"
+                }
+            ],
+            "description": "Soundex algorithm implemented in Indonesian and English",
+            "support": {
+                "issues": "https://github.com/CloudMyn/Soundex/issues",
+                "source": "https://github.com/CloudMyn/Soundex/tree/v0.0.2"
+            },
+            "time": "2021-10-03T05:57:02+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "dev",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": [],
+    "plugin-api-version": "2.1.0"
+}
