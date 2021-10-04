@@ -10,7 +10,7 @@ class SpellCheckerServiceProvider extends ServiceProvider
     public function boot()
     {
         // publish configuration and migration
-        // cmd: php artisan vendor:publish --provider="CloudMyn\SpellChecker\SpellCheckerServicerProvider" --tag="config"
+        // cmd: php artisan vendor:publish --provider="CloudMyn\SpellChecker\SpellCheckerServiceProvider" --tag="config"
         if ($this->app->runningInConsole()) {
 
             $this->commands([
@@ -18,9 +18,9 @@ class SpellCheckerServiceProvider extends ServiceProvider
             ]);
 
             // publish config file
-            // $this->publishes([
-            //     __DIR__ . '/../config/spellchecker.php' => config_path('spellchecker.php'),
-            // ], 'config');
+            $this->publishes([
+                __DIR__ . '/../config/spellchecker.php' => config_path('spellchecker.php'),
+            ], 'config');
 
             // ...
         }

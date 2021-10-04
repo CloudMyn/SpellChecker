@@ -77,6 +77,9 @@ class SpellChecker
         if (!file_exists($file_dic))
             throw new DictionaryException("File Dictionary not found! at : $file_dic");
 
+        $match_percentage = config('spellchecker.match_percentage', 95);
+        $sggest_percentage = config('spellchecker.suggest_percentage', 75);
+
         $matches        =   [];
         $suggestions    =   [];
 
@@ -103,17 +106,40 @@ class SpellChecker
 
             if ($soundex_word === $soundex) {
                 similar_text($actual_word, $word, $pecent);
-                if ($pecent >= 95) $matches[] = $actual_word;
-                else if ($pecent >= 75) $suggestions[] = $actual_word;
+                if ($pecent >= $match_percentage) $matches[] = $actual_word;
+                else if ($pecent >= $sggest_percentage) $suggestions[] = $actual_word;
             }
         }
 
         fclose($file);
+
+        self::findCostumesWord($word, $soundex, $matches, $suggestions);
 
         $data['matches']        =   $matches;
         $data['suggestions']    =   $suggestions;
         $data['typo']           =   count($matches) === 0 ? true : false;
 
         return $data;
+    }
+
+    private static function findCostumesWord(string $word, string $soundex, array &$matches, array &$suggestions)
+    {
+        // find in costumes dic
+        $costumes = config('spellchecker.costumes', []);
+
+        $match_percentage = config('spellchecker.match_percentage', 95);
+        $sggest_percentage = config('spellchecker.suggest_percentage', 75);
+
+        foreach ($costumes as $costume) {
+            $c_actual_word    =   count($costume) >= 1 ? $costume[0] : null;
+            $c_metaphon_word  =   count($costume) >= 2 ? $costume[1] : null;
+            $c_soundex_word   =   count($costume) >= 3 ? $costume[2] : null;
+
+            if ($c_soundex_word === $soundex) {
+                similar_text($c_actual_word, $word, $c_percent);
+                if ($c_percent >= $match_percentage) $matches[] = $c_actual_word;
+                else if ($c_percent >= $sggest_percentage) $suggestions[] = $c_actual_word;
+            }
+        }
     }
 }
