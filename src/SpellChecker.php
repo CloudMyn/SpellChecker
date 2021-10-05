@@ -17,14 +17,50 @@ class SpellChecker
      *  @param  string  $word
      *  @return array
      */
-    public static function checkWord(string $word, string $lang = "id_ID")
+    public static function checkWordId(string $word)
     {
         $word   =   preg_replace("/[^A-Za-z]/", '', $word);
 
         if ($word === '' || is_null($word)) return '';
 
         $soundex        = Soundex::soundexId($word);
-        $dic_directory  = getDicDirectory("$lang.dic");
+        $dic_directory  = getDicDirectory("id_ID.dic");
+
+        return self::check($soundex, $word, $dic_directory);
+    }
+
+    /**
+     *  Metode untuk mengecek kata dalam bahasa malaysia
+     *
+     *  @param  string  $word
+     *  @return array
+     */
+    public static function checkWordMy(string $word)
+    {
+        $word   =   preg_replace("/[^A-Za-z]/", '', $word);
+
+        if ($word === '' || is_null($word)) return '';
+
+        $soundex        = Soundex::soundexId($word);
+        $dic_directory  = getDicDirectory("my_MY.dic");
+
+        return self::check($soundex, $word, $dic_directory);
+    }
+
+    /**
+     *  Metode untuk mengecek kata dalam bahasa malaysia
+     *
+     *  @param  string  $word
+     *  @return array
+     */
+    public static function checkWordEn(string $word)
+    {
+        $word   =   preg_replace("/[^A-Za-z]/", '', $word);
+
+        if ($word === '' || is_null($word)) return '';
+
+        $soundex        = Soundex::soundexId($word);
+        $dic_directory  = getDicDirectory("en_US.dic");
 
         return self::check($soundex, $word, $dic_directory);
     }
