@@ -11,14 +11,21 @@ use function CloudMyn\SpellChecker\Helpers\getWordListDic;
 
 class Dictionary
 {
+
+    /**
+     *  Metode untuk generate kamus dasar berdasarkan wordlist yang tersedia
+     *
+     *  @return void
+     */
     public static function generate()
     {
 
         $files  =   self::getRawDic();
         $dic_d  =   getDicDirectory();
 
+        // delete the directory if exists
         if (file_exists($dic_d)) {
-            self::recurseRmdir($dic_d);
+            self::deleteDirectory($dic_d);
         }
 
         self::createDicFolder();
@@ -41,6 +48,11 @@ class Dictionary
         if (!file_exists($custom_dic)) file_put_contents($custom_dic, '');
     }
 
+    /**
+     *  Metode untuk generate custom kata dalam kalimat
+     *
+     *  @return bool
+     */
     public static function generateCustom(): bool
     {
         // create custom dictionary directory
@@ -188,13 +200,13 @@ class Dictionary
      *  @param  string  $dir
      *  @return bool
      */
-    private static function recurseRmdir(string $dir): bool
+    private static function deleteDirectory(string $dir): bool
     {
         try {
 
             $files = array_diff(scandir($dir), array('.', '..'));
             foreach ($files as $file) {
-                (is_dir("$dir/$file")) ? self::recurseRmdir("$dir/$file") : unlink("$dir/$file");
+                (is_dir("$dir/$file")) ? self::deleteDirectory("$dir/$file") : unlink("$dir/$file");
             }
 
             rmdir($dir);
