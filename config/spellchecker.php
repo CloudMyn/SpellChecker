@@ -20,28 +20,16 @@ return  [
     'suggest_percentage'    =>  75,
 
     /**
-     *  Daftar kamus bahasa yang tersedia
-     */
-    'dictionaries'   =>  ['en_US', 'id_ID', 'my_MY'],
+     *  Path to the custom dictionary file
 
-    /**
-     *  Array ini memunkinkan anda menambahkan kata baru
-     *  ke dalam mesin pengecekan
-     *
-     *  struktur kata yang di masukkan harus memiliki format dibwh ini
-     *  'kata::metaphone::soundex'
+     *  untuk aturan penulisan anda harus mengikuti format dibwah ini
+     *  ex:
+     *  -   abjad
+     *  -   adaptasi
+     *  -   bacot
+     *  setiap kosakata harus dimulia dengan garis baru dan kata
+     *  tidak boleh mengandung karakter selain alpabet
      */
-    'costumes'  =>  [
-        [
-            'pukis',
-            metaphone('pukis'),
-            Soundex::soundexId('pukis'),
-        ],
-        [
-            'kultivantod',
-            metaphone('kultivantod'),
-            Soundex::soundexId('kultivantod'),
-        ],
-    ],
+    'custom_dic'  =>  storage_path('spellchecker_custom.dic'),
 
 ];

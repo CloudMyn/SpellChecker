@@ -5,6 +5,7 @@ namespace CloudMyn\SpellChecker\Utils;
 use CloudMyn\MetaSearch\Utils\Soundex;
 use CloudMyn\SpellChecker\Exceptions\DictionaryException;
 
+use function CloudMyn\SpellChecker\Helpers\getCustomDicPath;
 use function CloudMyn\SpellChecker\Helpers\getDicDirectory;
 use function CloudMyn\SpellChecker\Helpers\getWordListDic;
 
@@ -12,7 +13,6 @@ class Dictionary
 {
     public static function generate()
     {
-        self::createDicFolder();
 
         $files  =   self::getRawDic();
         $dic_d  =   getDicDirectory();
@@ -20,6 +20,8 @@ class Dictionary
         if (file_exists($dic_d)) {
             self::recurseRmdir($dic_d);
         }
+
+        self::createDicFolder();
 
         foreach ($files as $file_name) {
 
@@ -33,30 +35,43 @@ class Dictionary
 
             fclose($file);
         }
+
+        // create custom dictionary directory
+        $custom_dic = config('spellchecker.custom_dic', storage_path('spellchecker_custom.dic'));
+        if (!file_exists($custom_dic)) file_put_contents($custom_dic, '');
     }
 
-    /**
-     *  Metode untuk menghapus direktory recursive
-     *
-     *  @param  string  $di
-     */
-    private static function recurseRmdir(string $dir)
+    public static function generateCustom(): bool
     {
-        $files = array_diff(scandir($dir), array('.', '..'));
-        foreach ($files as $file) {
-            (is_dir("$dir/$file")) ? self::recurseRmdir("$dir/$file") : unlink("$dir/$file");
+        // create custom dictionary directory
+        $custom_dic     = config('spellchecker.custom_dic', storage_path('spellchecker_custom.dic'));
+        $custom_path    = getCustomDicPath();
+
+        $file_read      =   fopen($custom_dic, 'r');
+        $file_custom    =   fopen($custom_path, 'a');
+
+        if (!$file_read || !$file_custom) return false;
+
+        while (!feof($file_read)) {
+            $line = fgets($file_read);
+
+            self::storeDictionary($file_custom, $line, '');
         }
 
-        rmdir($dir);
+        fclose($file_read);
+
+        return true;
     }
 
-    private static function readFile($file, string $file_name, string $dic_d)
+    private static function readFile(&$file, string $file_name, string $dic_d)
     {
         $lang_dic   =   explode(".", $file_name);
         $lang_dic   =   is_array($lang_dic) ? $lang_dic[0] : $lang_dic;
 
-        // X:..\CloudMyn\SpellChecker\src\Helpers\..\..\dic\
-        $file_path  =   "{$dic_d}{$lang_dic}";
+        // produce something like this x:{$file_path}\dic\en_US.dic
+        $file_path  =   "{$dic_d}{$lang_dic}.dic";
+
+        $file_dic = fopen($file_path, 'a');
 
         while (!feof($file)) {
 
@@ -65,22 +80,21 @@ class Dictionary
             // make sure the line its not emptied
             if ($line === "" or is_null($line)) continue;
 
-            // create xsmple: X:..\CloudMyn\SpellChecker\src\Helpers\..\..\dic\en_US
-            self::createDicFolder($lang_dic);
-
             // store the encoded word to new directory
-            self::storeDictionary($file_path, $line, $lang_dic);
+            self::storeDictionary($file_dic, $line, $lang_dic);
         }
+
+        fclose($file_dic);
     }
 
     /**
      *  Metode untuk menyimpan kamus yang telah di encode ke dalam file direktori
      *
-     *  @param  string  $file_path
+     *  @param  resource  $file_path
      *  @param  string  $f_line
      *  @param  string  $lang_dic
      */
-    private static function storeDictionary(string $file_path, string $f_line, string $lang_dic)
+    private static function storeDictionary(&$file, string $f_line, string $lang_dic)
     {
         // remove any non alphabet character from the string
         $word   =   preg_replace("/[^A-Za-z]/", '', $f_line);
@@ -108,18 +122,7 @@ class Dictionary
         $word   =   [$word, $metaphone, $soundex];
         $word   =   join("::", $word);
 
-        // 'Letter' => 'l' this wll be a prefix of the filename
-        $first_letter   =   strtolower($word[0]);
-        $file_name      =   "{$first_letter}_$lang_dic.dic";
-
-        // produce something like this x:{$file_path}\dic\en_US\a_en_us.dic
-        $file_path      =   $file_path . DIRECTORY_SEPARATOR . $file_name;
-
-        $file = fopen($file_path, 'a');
-
         fwrite($file, $word . PHP_EOL);
-
-        fclose($file);
     }
 
     /**
@@ -177,5 +180,33 @@ class Dictionary
         }
 
         return $files;
+    }
+
+    /**
+     *  Metode untuk menghapus direktory recursive
+     *
+     *  @param  string  $dir
+     *  @return bool
+     */
+    private static function recurseRmdir(string $dir): bool
+    {
+        try {
+
+            $files = array_diff(scandir($dir), array('.', '..'));
+            foreach ($files as $file) {
+                (is_dir("$dir/$file")) ? self::recurseRmdir("$dir/$file") : unlink("$dir/$file");
+            }
+
+            rmdir($dir);
+
+            return true;
+
+            // ...
+        } catch (\Throwable $th) {
+
+            report($th);
+
+            return false;
+        }
     }
 }

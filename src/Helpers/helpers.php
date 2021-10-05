@@ -7,7 +7,7 @@ if (function_exists('CloudMyn\SpellChecker\Helpers\getWordListDic') === false) {
     function getWordListDic(): string
     {
         $s = DIRECTORY_SEPARATOR;
-        return  __DIR__ . "{$s}..{$s}..{$s}wordlist{$s}";
+        return  storage_path("{$s}spellchecker{$s}wordlist{$s}");
     }
 }
 
@@ -15,7 +15,28 @@ if (function_exists('CloudMyn\SpellChecker\Helpers\getDicDirectory') === false) 
     function getDicDirectory(?string $file_name = null): string
     {
         $s = DIRECTORY_SEPARATOR;
-        return  __DIR__ . "{$s}..{$s}..{$s}dic{$s}{$file_name}";
+        return  storage_path("{$s}spellchecker{$s}dictionaries{$s}{$file_name}");
+    }
+}
+
+
+if (function_exists('CloudMyn\SpellChecker\Helpers\getCustomDicPath') === false) {
+
+    /**
+     *  Mendapatkan custom dictionary path
+     *  jika file tidak ada maka akan dibuat
+     *
+     *  @return string
+     */
+    function getCustomDicPath(): string
+    {
+        $s = DIRECTORY_SEPARATOR;
+
+        $path =  storage_path("{$s}spellchecker{$s}dictionaries{$s}custom_generated.dic");
+
+        if (!file_exists($path)) file_put_contents($path, '');
+
+        return $path;
     }
 }
 

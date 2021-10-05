@@ -16,54 +16,16 @@ class SpellChecker
      *  @param  string  $word
      *  @return array
      */
-    public static function checkWordId(string $word)
+    public static function checkWord(string $word, string $lang = "id_ID")
     {
         $word   =   preg_replace("/[^A-Za-z]/", '', $word);
 
         if ($word === '' || is_null($word)) return '';
-
-        $first_char = $word[0];
 
         $soundex        = Soundex::soundexId($word);
-        $dic_directory  = getDicDirectory("id_ID" . DIRECTORY_SEPARATOR . "{$first_char}_id_ID.dic");
+        $dic_directory  = getDicDirectory("$lang.dic");
 
-        return self::checkWord($soundex, $word, $dic_directory);
-    }
-
-
-    /**
-     *  Metode untuk mengecek kata dalam bahasa malaysia
-     *
-     *  @param  string  $word
-     *  @return array
-     */
-    public static function checkWordMy(string $word)
-    {
-        $word   =   preg_replace("/[^A-Za-z]/", '', $word);
-
-        if ($word === '' || is_null($word)) return '';
-
-        $first_char = $word[0];
-
-        $soundex        = Soundex::soundexId($word);
-        $dic_directory  = getDicDirectory("my_MY" . DIRECTORY_SEPARATOR . "{$first_char}_my_MY.dic");
-
-        return self::checkWord($soundex, $word, $dic_directory);
-    }
-
-
-    public static function checkWordEn(string $word)
-    {
-        $word   =   preg_replace("/[^A-Za-z]/", '', $word);
-
-        if ($word === '' || is_null($word)) return '';
-
-        $first_char = $word[0];
-
-        $soundex        = soundex($word);
-        $dic_directory  = getDicDirectory("en_US" . DIRECTORY_SEPARATOR . "{$first_char}_en_US.dic");
-
-        return self::checkWord($soundex, $word, $dic_directory);
+        return self::check($soundex, $word, $dic_directory);
     }
 
     /**
@@ -72,7 +34,7 @@ class SpellChecker
      *  @param  string  $lang
      *  @param  string  $word
      */
-    protected static function checkWord(string $soundex, string $word, string $file_dic)
+    protected static function check(string $soundex, string $word, string $file_dic)
     {
         if (!file_exists($file_dic))
             throw new DictionaryException("File Dictionary not found! at : $file_dic");
@@ -113,7 +75,7 @@ class SpellChecker
 
         fclose($file);
 
-        self::findCostumesWord($word, $soundex, $matches, $suggestions);
+        self::searchInCostumesDic($word, $soundex, $matches, $suggestions);
 
         $data['matches']        =   $matches;
         $data['suggestions']    =   $suggestions;
@@ -122,7 +84,7 @@ class SpellChecker
         return $data;
     }
 
-    private static function findCostumesWord(string $word, string $soundex, array &$matches, array &$suggestions)
+    private static function searchInCostumesDic(string $word, string $soundex, array &$matches, array &$suggestions)
     {
         // find in costumes dic
         $costumes = config('spellchecker.costumes', []);
