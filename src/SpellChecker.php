@@ -177,9 +177,12 @@ class SpellChecker
                     continue;
 
                 if ($soundex_word === $soundex) {
-                    similar_text($actual_word, $word, $pecent);
-                    if ($pecent >= $match_percentage) $matches[] = $actual_word;
-                    else if ($pecent >= $sggest_percentage) $suggestions[] = $actual_word;
+                    similar_text($actual_word, $word, $percent);
+                    if ($percent >= $match_percentage) $matches[] = $actual_word;
+                    else if ($percent >= $sggest_percentage) {
+                        $suggestions[intval($percent)] = $actual_word;
+                        krsort($suggestions);
+                    };
                 }
 
                 // ...

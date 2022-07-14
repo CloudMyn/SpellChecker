@@ -15,7 +15,7 @@ if (function_exists('CloudMyn\SpellChecker\Helpers\getDicDirectory') === false) 
     function getDicDirectory(?string $file_name = null): string
     {
         $s = DIRECTORY_SEPARATOR;
-        return  storage_path("{$s}spellchecker{$s}dictionaries{$s}{$file_name}");
+        return  storage_path("spellchecker{$s}dictionaries{$s}{$file_name}");
     }
 }
 
