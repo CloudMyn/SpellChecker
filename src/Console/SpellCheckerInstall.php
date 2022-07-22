@@ -31,10 +31,10 @@ class SpellCheckerInstall extends Command
             '--tag' => "config"
         ]);
 
-        File::copyDirectory(__DIR__ . "/../../wordlist/", getWordListDic());
+        // File::copyDirectory(__DIR__ . "/../../wordlist/", getWordListDic());
 
-        $result = $this->confirm('Apakah anda ingin men-generate kosakata dasar! ', true);
-        if ($result === true) $this->call('dictionary:generate');
+        // $result = $this->confirm('Apakah anda ingin men-generate kosakata dasar! ', true);
+        // if ($result === true) $this->call('dictionary:generate');
 
         $this->info('package installed successfuly');
     }

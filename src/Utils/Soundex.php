@@ -1,6 +1,6 @@
 <?php
 
-namespace CloudMyn\MetaSearch\Utils;
+namespace CloudMyn\SpellChecker\Utils;
 
 class Soundex
 {

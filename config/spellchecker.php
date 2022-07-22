@@ -20,6 +20,21 @@ return  [
     'suggest_percentage'    =>  75,
 
     /**
+     *  kamus utama
+     *
+     *  Pencarian kata akan di lakukan di kamus ini
+     */
+    'main_dic'  =>  'sp.dic',
+
+    /**
+     *  Table penelusuran kata
+     *
+     *  Table dan kolom yang di refrensikan akan kami generate
+     *  seluruh kata yang ada di dalamnya
+     */
+    'tables'    =>  [],
+
+    /**
      *  Path to the custom dictionary file
 
      *  untuk aturan penulisan anda harus mengikuti format dibwah ini

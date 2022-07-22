@@ -3,14 +3,6 @@
 namespace CloudMyn\SpellChecker\Helpers;
 
 
-if (function_exists('CloudMyn\SpellChecker\Helpers\getWordListDic') === false) {
-    function getWordListDic(): string
-    {
-        $s = DIRECTORY_SEPARATOR;
-        return  storage_path("{$s}spellchecker{$s}wordlist{$s}");
-    }
-}
-
 if (function_exists('CloudMyn\SpellChecker\Helpers\getDicDirectory') === false) {
     function getDicDirectory(?string $file_name = null): string
     {
@@ -46,5 +38,14 @@ if (function_exists('CloudMyn\SpellChecker\Helpers\strContains') === false) {
     {
         $result = preg_match("/{$find}/", $word);
         return $result >= 1 ? true : false;
+    }
+}
+
+if (function_exists('CloudMyn\SpellChecker\Helpers\arrayContains') === false) {
+    function arrayContains(string $word, array $words): bool
+    {
+        $result = array_search($word, $words);
+
+        return $result === false ? false : true;
     }
 }

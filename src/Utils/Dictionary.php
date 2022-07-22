@@ -2,8 +2,10 @@
 
 namespace CloudMyn\SpellChecker\Utils;
 
-use CloudMyn\MetaSearch\Utils\Soundex;
 use CloudMyn\SpellChecker\Exceptions\DictionaryException;
+use Exception;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 
 use function CloudMyn\SpellChecker\Helpers\getCustomDicPath;
 use function CloudMyn\SpellChecker\Helpers\getDicDirectory;
@@ -12,40 +14,73 @@ use function CloudMyn\SpellChecker\Helpers\getWordListDic;
 class Dictionary
 {
 
-    /**
-     *  Metode untuk generate kamus dasar berdasarkan wordlist yang tersedia
-     *
-     *  @return void
-     */
-    public static function generate()
+    public static function generateFromDatabase(array $tables)
     {
+        if (empty($tables)) throw new Exception("'tables' cannot be empty");
 
-        $files  =   self::getRawDic();
-        $dic_d  =   getDicDirectory();
+        $main_dic = config('spellchecker.main_dic');
 
-        // delete the directory if exists
-        if (file_exists($dic_d)) {
-            self::deleteDirectory($dic_d);
-        }
+        if (empty($main_dic)) new Exception("'main_dic' cannot be empty");
+
 
         self::createDicFolder();
 
-        foreach ($files as $file_name) {
+        $file_path = getDicDirectory($main_dic);
 
-            $file_path_raw_dic  =   getWordListDic() . $file_name;
-
-            $file   =   fopen($file_path_raw_dic, 'r');
-
-            if (!$file) continue;
-
-            self::readFile($file, $file_name, $dic_d);
-
-            fclose($file);
+        if (file_exists($file_path)) {
+            unlink($file_path);
         }
 
-        // create custom dictionary directory
-        $custom_dic = config('spellchecker.custom_dic', storage_path('spellchecker_custom.dic'));
-        if (!file_exists($custom_dic)) file_put_contents($custom_dic, '');
+        $file = fopen($file_path, 'a');
+
+        foreach ($tables as $tableK => $tableV) {
+
+            $data = DB::table($tableK)->get($tableV)->toJson();
+
+            $text = preg_replace("/[^A-Za-z]/", ' ', $data);
+
+            $text = strtolower(trim(preg_replace('/\s+/', ' ', $text)));
+
+            $words = explode(" ", $text);
+
+            foreach ($words as $word) {
+                // store the encoded word to new directory
+                self::storeDictionary($file, $word);
+            }
+        }
+
+        fclose($file);
+
+        $dic_words = [];
+
+        self::scanFile($file_path, function ($line) use (&$dic_words) {
+            $key = explode('::', $line)[0];
+
+            if (array_key_exists($key, $dic_words)) {
+
+                $dic_words[$key] = $dic_words[$key] + 1;
+
+                return;
+            }
+
+            $dic_words[$key] = 0;
+        });
+
+        // hapus file sebelumnya
+        if (file_exists($file_path)) {
+            unlink($file_path);
+        }
+
+        $file = fopen($file_path, 'a');
+
+        foreach ($dic_words as $word => $total) {
+            // store the encoded word to new directory
+            self::storeDictionary($file, $word, $total);
+        }
+    }
+
+    public static function update(array $words)
+    {
     }
 
     /**
@@ -67,7 +102,7 @@ class Dictionary
         while (!feof($file_read)) {
             $line = fgets($file_read);
 
-            self::storeDictionary($file_custom, $line, '');
+            self::storeDictionary($file_custom, $line, 0);
         }
 
         fclose($file_read);
@@ -75,15 +110,9 @@ class Dictionary
         return true;
     }
 
-    private static function readFile(&$file, string $file_name, string $dic_d)
+    private static function scanFile($file_path, $onScann)
     {
-        $lang_dic   =   explode(".", $file_name);
-        $lang_dic   =   is_array($lang_dic) ? $lang_dic[0] : $lang_dic;
-
-        // produce something like this x:{$file_path}\dic\en_US.dic
-        $file_path  =   "{$dic_d}{$lang_dic}.dic";
-
-        $file_dic = fopen($file_path, 'a');
+        $file = fopen($file_path, "r");
 
         while (!feof($file)) {
 
@@ -92,24 +121,21 @@ class Dictionary
             // make sure the line its not emptied
             if ($line === "" or is_null($line)) continue;
 
-            // store the encoded word to new directory
-            self::storeDictionary($file_dic, $line, $lang_dic);
+            $onScann($line);
         }
-
-        fclose($file_dic);
     }
 
     /**
      *  Metode untuk menyimpan kamus yang telah di encode ke dalam file direktori
      *
      *  @param  resource  $file_path
-     *  @param  string  $f_line
+     *  @param  string  $word
      *  @param  string  $lang_dic
      */
-    private static function storeDictionary(&$file, string $f_line, string $lang_dic)
+    private static function storeDictionary(&$file, string $word, int $total = 0, string $lang_dic = "")
     {
         // remove any non alphabet character from the string
-        $word   =   preg_replace("/[^A-Za-z]/", '', $f_line);
+        $word   =   preg_replace("/[^A-Za-z]/", '', $word);
 
         if ($word === "" || is_null($word)) return;
 
@@ -131,7 +157,7 @@ class Dictionary
                 $metaphone = metaphone($word);
         }
 
-        $word   =   [$word, $metaphone, $soundex];
+        $word   =   [$word, $metaphone, $soundex, $total];
         $word   =   join("::", $word);
 
         fwrite($file, $word . PHP_EOL);
@@ -169,29 +195,6 @@ class Dictionary
         }
 
         return false;
-    }
-
-    /**
-     *  Metode untuk mendapatkan raw data dari kamus
-     *
-     *  @return array
-     */
-    public static function getRawDic(): array
-    {
-        $wordlists  =   getWordListDic();
-
-        if (!file_exists($wordlists))
-            throw new DictionaryException("Dictionaries directory doesnt exists!");
-
-        $directories    =   scandir($wordlists);
-        $files  =   [];
-
-        foreach ($directories as $fs) {
-            $fpath  =   $wordlists .  $fs;
-            if (file_exists($fpath) && is_file($fpath)) $files[] = $fs;
-        }
-
-        return $files;
     }
 
     /**

@@ -15,7 +15,9 @@ class GenerateDictionary extends Command
     {
         $this->info('generating dictionary...');
 
-        Dictionary::generate();
+        $tables = config('spellchecker.tables');
+
+        Dictionary::generateFromDatabase($tables);
 
         $this->info('generated dictionary');
     }
