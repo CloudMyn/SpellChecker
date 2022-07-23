@@ -2,7 +2,6 @@
 
 namespace CloudMyn\SpellChecker;
 
-use CloudMyn\SpellChecker\Console\CustomDictionary;
 use CloudMyn\SpellChecker\Console\GenerateDictionary;
 use CloudMyn\SpellChecker\Console\SpellCheckerInstall;
 use Illuminate\Support\ServiceProvider;
@@ -18,7 +17,6 @@ class SpellCheckerServiceProvider extends ServiceProvider
             $this->commands([
                 GenerateDictionary::class,
                 SpellCheckerInstall::class,
-                CustomDictionary::class,
             ]);
 
             // publish config file

@@ -21,9 +21,15 @@ class SpellCheckerInstall extends Command
 
         $config_exists = file_exists($config_path);
 
+        $custom_dic = config('spellchecker.custom_dic');
+
         if ($config_exists && is_file($config_path)) {
             $result = $this->confirm('Konfigurasi telah tersedia!, apakah anda ingin menggantinya?', true);
             if ($result === true) unlink($config_path);
+        }
+
+        if(file_exists($custom_dic) == false) {
+            touch($custom_dic);
         }
 
         $this->call('vendor:publish', [

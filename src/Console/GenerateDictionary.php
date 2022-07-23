@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 
 class GenerateDictionary extends Command
 {
-    protected $signature = 'dictionary:generate';
+    protected $signature = 'spellchecker:generate';
 
     protected $description = 'generate the dictionary';
 
