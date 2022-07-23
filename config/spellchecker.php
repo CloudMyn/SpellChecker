@@ -45,6 +45,6 @@ return  [
      *  setiap kosakata harus dimulia dengan garis baru dan kata
      *  tidak boleh mengandung karakter selain alpabet
      */
-    'custom_dic'  =>  storage_path('spellchecker_custom.dic'),
+    'custom_dic'  =>  storage_path('spellchecker/spellchecker_custom.dic'),
 
 ];

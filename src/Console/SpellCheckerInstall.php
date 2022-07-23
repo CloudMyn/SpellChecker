@@ -4,6 +4,7 @@ namespace CloudMyn\SpellChecker\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 use function CloudMyn\SpellChecker\Helpers\getWordListDic;
 
@@ -29,7 +30,9 @@ class SpellCheckerInstall extends Command
         }
 
         if(file_exists($custom_dic) == false) {
-            touch($custom_dic);
+            Storage::makeDirectory($custom_dic);
+            $file = fopen($custom_dic, 'a+');
+            fclose($file);
         }
 
         $this->call('vendor:publish', [

@@ -91,11 +91,12 @@ class Dictionary
     {
         // create custom dictionary directory
         $custom_dic     = config('spellchecker.custom_dic', storage_path('spellchecker_custom.dic'));
-        $custom_path    = getCustomDicPath();
+        $custom_path    = getDicDirectory(config('spellchecker.main_dic'));
 
         $file_read      =   fopen($custom_dic, 'r');
         $file_custom    =   fopen($custom_path, 'a');
 
+        
         if (!$file_read || !$file_custom) return false;
 
         while (!feof($file_read)) {
