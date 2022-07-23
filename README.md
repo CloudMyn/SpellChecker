@@ -21,7 +21,3 @@ untuk menginstall dan setup package ini silahkan jalankan comand dibawah ini
 untuk men-generasikan kamus dasar silahkan jalankan comand dibawah ini
 
     php artisan spellchecker:generate
-
-untuk men-generasikan kamus yang telah ditambahkan/dikostum
-
-    php artisan custom:generate
