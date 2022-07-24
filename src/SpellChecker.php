@@ -62,6 +62,7 @@ class SpellChecker
             'actual_sentence'   =>  $sentence,
             'top_match'         =>  $f_sentence,
             'suggested'         =>  $sentences,
+            'is_typo'           =>  strtolower($sentence) !== strtolower($f_sentence),
         ];
     }
 
