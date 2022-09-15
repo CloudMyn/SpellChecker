@@ -49,9 +49,6 @@ class Dictionary
             }
         }
 
-        // generate costum dic
-        self::generateCustom();
-
         fclose($file);
 
         $dic_words = [];
@@ -80,6 +77,9 @@ class Dictionary
             // store the encoded word to new directory
             self::storeDictionary($file, $word, $total);
         }
+
+        // generate costum dic
+        self::generateCustom();
     }
 
     /**
