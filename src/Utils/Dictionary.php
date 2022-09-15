@@ -96,13 +96,15 @@ class Dictionary
         $file_read      =   fopen($custom_dic, 'r');
         $file_custom    =   fopen($custom_path, 'a');
 
-        
+
         if (!$file_read || !$file_custom) return false;
 
         while (!feof($file_read)) {
             $line = fgets($file_read);
 
-            self::storeDictionary($file_custom, $line, 0);
+            $words = explode("::", $line);
+
+            self::storeDictionary($file_custom, $words[0], intval($words[1]));
         }
 
         fclose($file_read);
