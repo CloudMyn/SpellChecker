@@ -104,7 +104,9 @@ class Dictionary
 
             $words = explode("::", $line);
 
-            self::storeDictionary($file_custom, $words[0], intval($words[1]));
+            $len = count($words) >= 2 ? intval($words[1]) : 0;
+
+            self::storeDictionary($file_custom, $words[0], $len);
         }
 
         fclose($file_read);
